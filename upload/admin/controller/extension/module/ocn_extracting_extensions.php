@@ -2,6 +2,14 @@
 class ControllerExtensionModuleOCNExtractingExtensions extends Controller {
 	private $error = array ();
 	private $dissallow_dir = array();
+	
+	public function install() {
+		$this->load->model('setting/setting');
+		$data = ['module_ocn_extracting_extensions_status' => 1];
+		$this->model_setting_setting->editSetting('module_ocn_extracting_extensions', $data);
+	}
+	
+	public function uninstall(){}
 
 	public function index() {
 		$this->load->language('extension/module/ocn_extracting_extensions');
@@ -37,6 +45,7 @@ class ControllerExtensionModuleOCNExtractingExtensions extends Controller {
 			$data['success'] = '';
 		}
 		
+		$data['cancel'] = $this->url->link('marketplace/extension', 'user_token=' . $this->session->data['user_token'] . '&type=module', true);
 		$data['search'] = $this->url->link('extension/module/ocn_extracting_extensions/search', 'user_token=' . $this->session->data['user_token'] . '&page=modules', true);
 		$data['files'] = $this->url->link('extension/module/ocn_extracting_extensions/files', 'user_token=' . $this->session->data['user_token'], true);
 		$data['extract'] = $this->url->link('extension/module/ocn_extracting_extensions/extract', 'user_token=' . $this->session->data['user_token'], true);
