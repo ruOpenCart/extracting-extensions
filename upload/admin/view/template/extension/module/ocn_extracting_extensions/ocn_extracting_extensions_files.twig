@@ -12,9 +12,9 @@
         </tr>
         <tr>
           <td class="left"><input type="checkbox" onclick="$('input[name*=\'module_list\']').attr('checked', this.checked);" /></td>
-          <td class="left">{{ text_module_name }}</td>
-          <td class="left">{{ text_module_size }}</td>
-          <td class="center">{{ text_module_date }}</td>
+          <td class="left">{{ column_module_name }}</td>
+          <td class="left">{{ column_module_size }}</td>
+          <td class="center">{{ column_module_date }}</td>
         </tr>
         </thead>
         {% for module in module_list %}

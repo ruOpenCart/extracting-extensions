@@ -1,44 +1,54 @@
-<form action="{{ extract }}" class="form-horizontal" method="post" enctype="multipart/form-data" id="form-extract">
-  <input type="hidden" name="extract_module" value="{{ module }}">
-  {% if (module_total is defined) %}
-    <em>{{ text_total_search }} {{ module_total }}</em>
-  {% endif %}
-  {% if (module_search) %}
+{% if (module_search) %}
+  <form action="{{ extract }}" class="form-horizontal" method="post" enctype="multipart/form-data" id="form-extract">
+    <input type="hidden" name="extract_module" value="{{ module }}">
     <div class="table-responsive">
       <table class="table table-striped table-bordered table-hover">
         <thead>
-        <tr>
-          <td class="center" width="1%"><input type="checkbox" onclick="$('input[name*=\'module_search\']').attr('checked', this.checked);" /></td>
-          <td class="left" width="44%">{{ text_path_name }}</td>
-          <td class="left" width="45%">{{ text_file_name }}</td>
-        </tr>
-        </thead>
-        {% for modules in module_search %}
-          <tr class="filter">
-            <td class="left" colspan="3"><b style="text-transform:uppercase;">{{ modules['module'] }}({{ modules.files|length }})</b></td>
+          <tr>
+            <td class="center" width="1%"><input type="checkbox" id="module-select-all"></td>
+            <td class="left" width="44%">{{ column_path_name }}</td>
+            <td class="left" width="45%">{{ column_file_name }}</td>
           </tr>
-          {% for module in modules['files'] %}
+        </thead>
+        <tbody>
+          {% for modules in module_search %}
             <tr>
-              <td class="center"><input type="checkbox" name="module_search[]" value="{{ module['name'] }}" /></td>
-              <td class="left">{{ module['path'] }}</td>
-              <td class="left">{{ module['file'] }}</td>
+              <td class="left" colspan="3"><b style="text-transform:uppercase;">{{ modules['module'] }}({{ modules.files|length }})</b></td>
             </tr>
+            {% for module in modules['files'] %}
+              <tr>
+                <td class="center"><input type="checkbox" name="module_search[]" value="{{ module['name'] }}" /></td>
+                <td class="left">{{ module['path'] }}</td>
+                <td class="left">{{ module['file'] }}</td>
+              </tr>
+            {% endfor %}
           {% endfor %}
-        {% endfor %}
+        </tbody>
         <tfoot>
-        <tr>
-          <td class="center" colspan="3">
-            {% if (module_total is defined and module_total) %}
-{#              <button class="btn btn-warning" type="button" id="button-extract" data-url="{{ extract }}"><i class="fa fa-file-archive-o"></i> {{ button_extract }}</button>#}
-            {% endif %}
-          </td>
-        </tr>
+          <tr>
+            <td class="center" colspan="3">
+              {% if (module_total is defined) %}
+                <div class="alert alert-success alert-dismissible" role="alert">
+                  <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                  <strong>{{ success }}</strong> {{ text_total_search }} : {{ module_total }}
+                </div>
+              {% endif %}
+            </td>
+          </tr>
         </tfoot>
       </table>
     </div>
-  {% endif %}
-</form>
+  </form>
+{% else %}
+  <div class="alert alert-warning alert-dismissible" role="alert">
+    <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+    <strong>{{ warning }}</strong> {{ empty_search }}
+  </div>
+{% endif %}
 <script>
 $(document).ready(function(){
+  $('#module-select-all').on('click', function () {
+    $('input[name*="module_search"]').prop('checked', this.checked);
+  })
 });
 </script>

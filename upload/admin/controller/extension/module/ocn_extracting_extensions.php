@@ -9,18 +9,33 @@ class ControllerExtensionModuleOCNExtractingExtensions extends Controller {
 
 		$data['breadcrumbs'] = array (
 			array (
-				'text'      => $this->language->get('text_home'),
-				'href'      => $this->url->link('common/dashboard', 'user_token=' . $this->session->data['user_token'], true)
+				'text' => $this->language->get('text_home'),
+				'href' => $this->url->link('common/dashboard', 'user_token=' . $this->session->data['user_token'], true)
 			),
 			array (
-				'text'      => $this->language->get('text_extension'),
-				'href'      => $this->url->link('marketplace/extension', 'user_token=' . $this->session->data['user_token'] . '&type=module', true)
+				'text' => $this->language->get('text_extension'),
+				'href' => $this->url->link('marketplace/extension', 'user_token=' . $this->session->data['user_token'] . '&type=module', true)
 			),
 			array (
-				'text'      => $this->language->get('heading_title'),
-				'href'      => $this->url->link('extension/module/ocn_extracting_extensions', 'user_token=' . $this->session->data['user_token'], true),
+				'text' => $this->language->get('heading_title'),
+				'href' => $this->url->link('extension/module/ocn_extracting_extensions', 'user_token=' . $this->session->data['user_token'], true),
 			)
 		);
+		
+		//Errors
+		if (isset($this->error['warning'])) {
+			$data['error_warning'] = $this->error['warning'];
+		} else {
+			$data['error_warning'] = '';
+		}
+		
+		if (isset($this->session->data['success'])) {
+			$data['success'] = $this->session->data['success'];
+			
+			unset($this->session->data['success']);
+		} else {
+			$data['success'] = '';
+		}
 		
 		$data['search'] = $this->url->link('extension/module/ocn_extracting_extensions/search', 'user_token=' . $this->session->data['user_token'] . '&page=modules', true);
 		$data['files'] = $this->url->link('extension/module/ocn_extracting_extensions/files', 'user_token=' . $this->session->data['user_token'], true);
@@ -38,7 +53,7 @@ class ControllerExtensionModuleOCNExtractingExtensions extends Controller {
 		$this->load->language('extension/module/ocn_extracting_extensions');
 		
 		if ($this->validateModules()) {
-			$data['success'] = $this->language->get('text_success');
+			$data['success'] = $this->language->get('success');
 			$data['module'] = (string)$this->request->post['module'];
 			
 			// @todo накер проверка на пост модуль сёрч???
@@ -62,7 +77,7 @@ class ControllerExtensionModuleOCNExtractingExtensions extends Controller {
 		$this->load->language('extension/module/ocn_extracting_extensions');
 		
 		if ($this->validateFiles()) {
-			$data['success'] = $this->language->get('text_success');
+			$data['success'] = $this->language->get('success');
 			$data['module_list' ] = $this->moduleList();
 			$data['module_total'] = count($data['module_list']);
 			$data['remove'] = $this->url->link('extension/module/ocn_extracting_extensions/remove', 'user_token=' . $this->session->data['user_token'], true);
@@ -80,7 +95,7 @@ class ControllerExtensionModuleOCNExtractingExtensions extends Controller {
 		if ($this->validateExtract() && isset($this->request->post['module_search']) && is_array ($this->request->post['module_search'])) {
 			$module_name = (string)$this->request->post['extract_module'];
 			$this->moduleExtract($this->request->post['module_search'], $module_name);
-			$data['success'] = str_replace('{NAME}', $module_name, $this->language->get('success_extract'));;
+			$data['success'] = str_replace('{name}', $module_name, $this->language->get('success_extract'));;
 		} else {
 			$data['error'] = $this->error;
 		}
