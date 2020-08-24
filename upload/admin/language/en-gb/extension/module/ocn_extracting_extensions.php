@@ -36,8 +36,7 @@ $_['text_version']         = 'Extension version';
 $_['text_author']          = 'Extension author';
 $_['text_module_name']     = 'Module name';
 $_['text_extension']       = 'Extensions';
-$_['text_total_search']    = 'Total found';
-$_['text_total']           = 'Total:';
+$_['text_total']           = 'Total found:';
 
 // Success
 $_['success']              = 'Success!';
@@ -49,6 +48,7 @@ $_['warning']              = 'Warning!';
 
 // Empty
 $_['empty_search']         = 'No items were found matching your criteria. Check the module name.';
+$_['empty_files']          = 'No files found. To unload the module go to the <b>Search</b> tab.';
 
 // Error
 $_['error_permission']     = 'You have no rights to control the module Module Extract!';

@@ -24,7 +24,7 @@
     <div class="panel panel-default">
       <div class="panel-heading">
         <div class="pull-right">
-          <a href="{{ cancel }}" data-toggle="tooltip" title="{{ button_cancel }}" class="btn btn-default"><i class="fa fa-reply"></i></a>
+          <a href="{{ url_cancel }}" data-toggle="tooltip" title="{{ button_cancel }}" class="btn btn-default"><i class="fa fa-reply"></i></a>
         </div>
         <h1>{{ heading_title }}</h1>
       </div>
@@ -45,13 +45,13 @@
                 <div class="input-group">
                   <input type="text" class="form-control" id="input-search" name="module" value="{{ module }}" required>
                   <span class="input-group-btn">
-                    <button class="btn btn-primary" type="button" id="button-search" data-url="{{ search }}" data-warning="{{ warning }}" data-error="{{ error_module }}"><i class="fa fa-search"></i> {{ button_search }}</button>
+                    <button class="btn btn-primary" type="button" id="button-search" data-url="{{ url_search }}" data-warning="{{ warning }}" data-error="{{ error_module }}"><i class="fa fa-search"></i> {{ button_search }}</button>
                   </span>
                 </div>
               </div>
               <div class="col-sm-3">
                 <div class="btn-group pull-right" role="group">
-                  <button class="btn btn-warning" type="button" id="button-extract" data-url="{{ extract }}" data-success="{{ success }}" data-warning="{{ warning }}" data-error="{{ error_extract }}"><i class="fa fa-file-archive-o"></i> {{ button_extract }}</button>
+                  <button class="btn btn-warning" type="button" id="button-extract" data-url="{{ url_extract }}" data-success="{{ success }}" data-warning="{{ warning }}" data-error="{{ error_extract }}"><i class="fa fa-file-archive-o"></i> {{ button_extract }}</button>
                   <button class="btn btn-secondary" type="button" id="button-clear"><i class="fa fa-times"></i> {{ button_clear }}</button>
                 </div>
               </div>
@@ -62,10 +62,15 @@
 
           <div class="tab-pane fade" id="tab-files">
             <div class="row">
-              <div class="col-sm-12">
-                <button class="btn btn-primary" type="button" id="button-files" data-url="{{ files }}"><i class="fa fa-refresh"></i> {{ text_update }}</button>
+              <div class="col-sm-9"></div>
+              <div class="col-sm-3">
+                <div class="btn-group pull-right" role="group">
+                  <button class="btn btn-primary" type="button" id="button-files" data-url="{{ url_files }}" data-success="{{ success }}" data-warning="{{ warning }}"><i class="fa fa-refresh"></i> {{ button_update }}</button>
+                  <button class="btn btn-danger" type="button" id="button-remove" data-url="{{ url_remove }}" data-success="{{ success }}" data-warning="{{ warning }}" data-error="{{ error_select_delete }}"><i class="fa fa-trash"></i> {{ button_remove }}</button>
+                </div>
               </div>
             </div>
+            <hr>
             <div id="files"></div>
           </div>
 
@@ -113,7 +118,7 @@ $(document).ready(function(){
     } else {
       const warning = button.attr('data-warning');
       const error = button.attr('data-error');
-      showAlert('warning', warning, error);
+      showAlert($('#list'), 'warning', warning, error);
     }
   });
 
@@ -127,60 +132,112 @@ $(document).ready(function(){
 
   $('#button-extract').on('click', function () {
     const button = $('#button-extract');
+    let list = $("#list");
     let checked = [];
     $('input[name*="module_search"]:checked').each(function() {
         checked.push(this.value);
     });
-    $('#list > .alert').hide('slow');
+    // $('#list > .alert').hide('slow');
+    // clearAlerts();
 
     if (checked.length) {
       const url = button.attr('data-url');
       const success = button.attr('data-success');
 
-      lockButtons()
+      lock()
       button.find('i.fa').removeClass('fa-file-archive-o').addClass('fa-spinner fa-pulse');
 
       $.ajax({
         type: 'post',
         url: url,
-        data: $('#form-extract').serialize(),
+        data: $('#form-search').serialize(),
         dataType: 'json',
         success: function (response) {
-          showAlert('success', success, response.success);
+          showAlert(list, 'success', success, response.success);
         },
         error: function (xhr, ajaxOptions, thrownError) {
           alert(thrownError + "\r\n" + xhr.statusText + "\r\n" + xhr.responseText);
         },
         complete: function () {
-          unLockButtons();
+          unLock();
           button.find('i.fa').removeClass('fa-spinner fa-pulse').addClass('fa-file-archive-o');
         }
       });
     } else {
       const warning = button.attr('data-warning');
       const error = button.attr('data-error');
-      showAlert('warning', warning, error);
+      showAlert(list, 'warning', warning, error);
     }
   });
 
-  function showAlert(color = 'info', status = success, text = 'Нет сообщения.') {
-    let alertBlock = '<div class="alert alert-' + color + ' alert-dismissible" role="alert"><button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button><strong>' + status + '</strong> ' + text + '</div>';
-    $('#list').prepend(alertBlock);
-  }
-
-  function getFiles() {
+  function getFiles(data = false) {
     const button = $('#button-files');
     const url = button.attr('data-url');
-    $("#files").load(url, function( response, status, xhr ) {
+    let files = $("#files");
+
+    files.html('');
+    lock();
+    button.find('i.fa').removeClass('fa-refresh').addClass('fa-spinner fa-pulse');
+
+    files.load(url, function( response, status, xhr ) {
       if ( status === "error" ) {
         let msg = "Error: ";
-        $( "#files" ).html( msg + xhr.status + " " + xhr.statusText );
+          files.html( msg + xhr.status + " " + xhr.statusText );
       }
       if ( status === "success" ) {
         // if status success
       }
+
+      if (data) {
+        showAlert(files, data.color, data.status, data.success);
+      }
+
+      unLock()
+      button.find('i.fa').removeClass('fa-spinner fa-pulse').addClass('fa-refresh');
     });
   }
+
+  $('#button-remove').on('click', function () {
+    const button = $('#button-remove');
+    const url = button.attr('data-url');
+    let files = $("#files");
+    let checked = [];
+    $('input[name*="module_list"]:checked').each(function() {
+        checked.push(this.value);
+    });
+
+    if (checked.length) {
+      lock();
+      button.find('i.fa').removeClass('fa-trash').addClass('fa-spinner fa-pulse');
+
+      $.ajax({
+        type: 'post',
+        url: url,
+        data: $('#form-files').serialize(),
+        dataType: 'json',
+        success: function(response) {
+          console.log(response);
+          let data = {
+              color: 'success',
+              status: response.status,
+              success: response.success
+          };
+          getFiles(data);
+          // @todo сделать вывод ошибок
+        },
+        error: function(xhr, ajaxOptions, thrownError) {
+          alert(thrownError + "\r\n" + xhr.statusText + "\r\n" + xhr.responseText);
+        },
+        complete: function(response) {
+          button.find('i.fa').removeClass('fa-spinner fa-pulse').addClass('fa-trash');
+        }
+      });
+    } else {
+      const warning = button.attr('data-warning');
+      const error = button.attr('data-error');
+      showAlert(files, 'warning', warning, error);
+    }
+  });
 
   function searchModules(module) {
     const button = $('#button-search');
@@ -188,7 +245,7 @@ $(document).ready(function(){
     let list = $("#list");
 
     list.html('');
-    lockButtons();
+    lock();
     button.find('i.fa').removeClass('fa-search').addClass('fa-spinner fa-pulse');
 
     list.load(
@@ -202,24 +259,34 @@ $(document).ready(function(){
         if ( status === "success" ) {
           // if status success
         }
-        unLockButtons()
+        unLock()
         button.find('i.fa').removeClass('fa-spinner fa-pulse').addClass('fa-search');
       }
     );
   }
 
-  function lockButtons() {
+  function lock() {
     $('#input-search').prop('disabled', true);
     $('#button-extract').prop('disabled', true);
     $('#button-clear').prop('disabled', true);
     $('#button-search').prop('disabled', true);
+    $('#button-files').prop('disabled', true);
+    $('#button-remove').prop('disabled', true);
   }
 
-  function unLockButtons() {
+  function unLock() {
     $('#input-search').prop('disabled', false);
     $('#button-extract').prop('disabled', false);
     $('#button-clear').prop('disabled', false);
     $('#button-search').prop('disabled', false);
+    $('#button-files').prop('disabled', false);
+    $('#button-remove').prop('disabled', false);
+  }
+
+  function showAlert(block, color, status, text) {
+    block.find('> .alert').hide('slow');
+    let alertBlock = '<div class="alert alert-' + color + ' alert-dismissible" role="alert"><button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button><strong>' + status + '</strong> ' + text + '</div>';
+    block.prepend(alertBlock);
   }
 
   function clearAlerts() {

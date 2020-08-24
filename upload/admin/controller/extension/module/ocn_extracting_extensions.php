@@ -39,16 +39,16 @@ class ControllerExtensionModuleOCNExtractingExtensions extends Controller {
 		
 		if (isset($this->session->data['success'])) {
 			$data['success'] = $this->session->data['success'];
-			
 			unset($this->session->data['success']);
 		} else {
 			$data['success'] = '';
 		}
 		
-		$data['cancel'] = $this->url->link('marketplace/extension', 'user_token=' . $this->session->data['user_token'] . '&type=module', true);
-		$data['search'] = $this->url->link('extension/module/ocn_extracting_extensions/search', 'user_token=' . $this->session->data['user_token'] . '&page=modules', true);
-		$data['files'] = $this->url->link('extension/module/ocn_extracting_extensions/files', 'user_token=' . $this->session->data['user_token'], true);
-		$data['extract'] = $this->url->link('extension/module/ocn_extracting_extensions/extract', 'user_token=' . $this->session->data['user_token'], true);
+		$data['url_cancel'] = $this->url->link('marketplace/extension', 'user_token=' . $this->session->data['user_token'] . '&type=module', true);
+		$data['url_search'] = $this->url->link('extension/module/ocn_extracting_extensions/search', 'user_token=' . $this->session->data['user_token'] . '&page=modules', true);
+		$data['url_files'] = $this->url->link('extension/module/ocn_extracting_extensions/files', 'user_token=' . $this->session->data['user_token'], true);
+		$data['url_extract'] = $this->url->link('extension/module/ocn_extracting_extensions/extract', 'user_token=' . $this->session->data['user_token'], true);
+		$data['url_remove'] = $this->url->link('extension/module/ocn_extracting_extensions/remove', 'user_token=' . $this->session->data['user_token'], true);
 
 		// View
 		$data['header'] = $this->load->controller('common/header');
@@ -89,7 +89,6 @@ class ControllerExtensionModuleOCNExtractingExtensions extends Controller {
 			$data['success'] = $this->language->get('success');
 			$data['module_list' ] = $this->moduleList();
 			$data['module_total'] = count($data['module_list']);
-			$data['remove'] = $this->url->link('extension/module/ocn_extracting_extensions/remove', 'user_token=' . $this->session->data['user_token'], true);
 		} else {
 			$data['error'] = $this->error;
 		}
@@ -97,8 +96,7 @@ class ControllerExtensionModuleOCNExtractingExtensions extends Controller {
 		$this->response->setOutput($this->load->view('extension/module/ocn_extracting_extensions/ocn_extracting_extensions_files', $data));
 	}
 	
-	public function extract()
-	{
+	public function extract() {
 		$this->load->language('extension/module/ocn_extracting_extensions');
 		
 		if ($this->validateExtract() && isset($this->request->post['module_search']) && is_array ($this->request->post['module_search'])) {
@@ -125,6 +123,7 @@ class ControllerExtensionModuleOCNExtractingExtensions extends Controller {
 			}
 			
 			$data['success'] = $this->language->get('success_delete');
+			$data['status'] = $this->language->get('success');
 		} else {
 			$data['error'] = $this->error;
 		}

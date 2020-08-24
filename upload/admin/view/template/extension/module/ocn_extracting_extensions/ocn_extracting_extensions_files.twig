@@ -1,65 +1,50 @@
-<form action="{{ remove }}" class="form-horizontal" method="post" enctype="multipart/form-data" id="form-files">
-  <div class="table-responsive">
-    <table class="table table-striped table-bordered table-hover">
-      {% if (module_list) %}
+{% if (module_list) %}
+  <form action="{{ remove }}" class="form-horizontal" method="post" enctype="multipart/form-data" id="form-files">
+    <div class="table-responsive">
+      <table class="table table-striped table-bordered table-hover">
         <thead>
-        <tr>
-          <td class="left" style="background-color: #FFFFFF;" colspan="5">
-            {% if (module_total) %}
-              <em>{{ text_total }} {{ module_total }}</em>
-            {% endif %}
-          </td>
-        </tr>
-        <tr>
-          <td class="left"><input type="checkbox" onclick="$('input[name*=\'module_list\']').attr('checked', this.checked);" /></td>
-          <td class="left">{{ column_module_name }}</td>
-          <td class="left">{{ column_module_size }}</td>
-          <td class="center">{{ column_module_date }}</td>
-        </tr>
+          <tr>
+            <td class="text-center"><input type="checkbox"  id="files-select-all"></td>
+            <td>{{ column_module_name }}</td>
+            <td>{{ column_module_size }}</td>
+            <td>{{ column_module_date }}</td>
+          </tr>
         </thead>
         {% for module in module_list %}
           <tbody>
-          <tr>
-            <td class="center" width="1%"><input name="module_list[]" type="checkbox" value="{{ module['file'] }}" /></td>
-            <td class="left"><a href="{{ module['link'] }}">{{ module['name'] }}</a></td>
-            <td class="left">{{ module['size' ] }}</td>
-            <td class="center">{{ module['date'] }}</td>
-          </tr>
+            <tr>
+              <td class="text-center"><input name="module_list[]" type="checkbox" value="{{ module['file'] }}"></td>
+              <td><a href="{{ module['link'] }}">{{ module['name'] }}</a></td>
+              <td>{{ module['size' ] }}</td>
+              <td>{{ module['date'] }}</td>
+            </tr>
           </tbody>
         {% endfor %}
         <tfoot>
-        <tr>
-          <td class="center" colspan="5">
-            <button class="btn btn-danger" type="button" id="button-remove" data-url="{{ remove }}"><i class="fa fa-trash"></i> {{ button_remove }}</button>
-          </td>
-        </tr>
+          <tr>
+            <td colspan="4">
+              {% if (module_total) %}
+                <div class="alert alert-success alert-dismissible" role="alert">
+                  <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                  <strong>{{ success }}</strong> {{ text_total }} {{ module_total }}
+                </div>
+              {% endif %}
+            </td>
+          </tr>
         </tfoot>
-      {% else %}
-        <tr>
-          <td class="center">{{ text_no_results }}</td>
-        </tr>
-      {% endif %}
-    </table>
+      </table>
+    </div>
+  </form>
+{% else %}
+  <div class="alert alert-warning alert-dismissible" role="alert">
+    <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+    <strong>{{ warning }}</strong> {{ empty_files }}
   </div>
-</form>
+{% endif %}
 <script>
 $(document).ready(function() {
-  $('#button-remove').on('click', function () {
-    const button = $('#button-remove');
-    const url = button.attr('data-url');
-    $.ajax({
-      type: 'post',
-      url: url,
-      data: $('#form-files').serialize(),
-      dataType: 'json',
-      success: function(response) {
-        console.log(response)
-        // @todo сделать вывод ошибок
-      },
-      error: function(xhr, ajaxOptions, thrownError) {
-        alert(thrownError + "\r\n" + xhr.statusText + "\r\n" + xhr.responseText);
-      }
-    });
+  $('#files-select-all').on('click', function () {
+    $('input[name*="module_list"]').prop('checked', this.checked);
   })
 });
 </script>
