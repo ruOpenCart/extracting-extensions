@@ -36,13 +36,13 @@ $_['text_version']         = 'Версия расширения';
 $_['text_author']          = 'Автор расширения';
 $_['text_module_name']     = 'Название модуля';
 $_['text_extension']       = 'Расширения';
-$_['text_total_search']    = 'Всего найдено';
+$_['text_total_search']    = 'Всего найдено:';
 $_['text_total']           = 'Всего:';
 
 // Success
 $_['success']              = 'Успешно!';
 $_['success_delete']       = 'Выбранные файлы успешно удалены!';
-$_['success_extract']      = 'Модуль {name} успешно извлечен!';
+$_['success_extract']      = 'Модуль {name} успешно извлечен! Перейдите на вкладку <b>Файлы</b> для скачивания архива.';
 
 // Warning
 $_['warning']              = 'Внимание!';

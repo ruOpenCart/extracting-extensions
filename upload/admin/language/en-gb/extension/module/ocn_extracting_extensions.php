@@ -42,7 +42,7 @@ $_['text_total']           = 'Total:';
 // Success
 $_['success']              = 'Success!';
 $_['success_delete']       = 'The selected files deleted successfully!';
-$_['success_extract']      = 'Module {name} was successfully extract!';
+$_['success_extract']      = 'Module {name} was successfully extract! Go to the Files tab to download the archive.';
 
 // Warning
 $_['warning']              = 'Warning!';
