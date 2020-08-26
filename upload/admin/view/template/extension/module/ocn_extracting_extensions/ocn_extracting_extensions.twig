@@ -112,7 +112,7 @@ $(document).ready(function(){
   $('#button-search').on('click', function () {
     const module = $('#input-search').val();
     const button = $('#button-search');
-    clearAlerts()
+    clearAlerts();
     if (module !== '') {
       searchModules(module);
     } else {
@@ -137,14 +137,13 @@ $(document).ready(function(){
     $('input[name*="module_search"]:checked').each(function() {
         checked.push(this.value);
     });
-    // $('#list > .alert').hide('slow');
-    // clearAlerts();
+    clearAlerts(list);
 
     if (checked.length) {
       const url = button.attr('data-url');
       const success = button.attr('data-success');
 
-      lock()
+      lock();
       button.find('i.fa').removeClass('fa-file-archive-o').addClass('fa-spinner fa-pulse');
 
       $.ajax({
@@ -168,6 +167,12 @@ $(document).ready(function(){
       const error = button.attr('data-error');
       showAlert(list, 'warning', warning, error);
     }
+    
+    setTimeout(function() {
+      clearAlerts(list);
+      }, 
+      10000
+    );
   });
 
   function getFiles(data = false) {
@@ -237,6 +242,12 @@ $(document).ready(function(){
       const error = button.attr('data-error');
       showAlert(files, 'warning', warning, error);
     }
+
+    setTimeout(function() {
+      clearAlerts(files);
+      },
+      10000
+    );
   });
 
   function searchModules(module) {
@@ -289,8 +300,12 @@ $(document).ready(function(){
     block.prepend(alertBlock);
   }
 
-  function clearAlerts() {
-    $('.alert').hide('slow');
+  function clearAlerts(block = false) {
+    if (block) {
+      block.find('> .alert').hide('slow');
+    } else {
+      $('.alert').hide('slow');
+    }
   }
 });
 </script>

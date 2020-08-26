@@ -78,6 +78,8 @@ class ControllerExtensionModuleOCNExtractingExtensions extends Controller {
 		} else {
 			$data['error'] = $this->error;
 		}
+
+		$data['url_extract'] = $this->url->link('extension/module/ocn_extracting_extensions/extract', 'user_token=' . $this->session->data['user_token'], true);
 		
 		$this->response->setOutput($this->load->view('extension/module/ocn_extracting_extensions/ocn_extracting_extensions_list', $data));
 	}
@@ -92,6 +94,8 @@ class ControllerExtensionModuleOCNExtractingExtensions extends Controller {
 		} else {
 			$data['error'] = $this->error;
 		}
+		
+		$data['url_remove'] = $this->url->link('extension/module/ocn_extracting_extensions/remove', 'user_token=' . $this->session->data['user_token'], true);
 		
 		$this->response->setOutput($this->load->view('extension/module/ocn_extracting_extensions/ocn_extracting_extensions_files', $data));
 	}
