@@ -1,39 +1,37 @@
 {% if (module_list) %}
-  <form action="{{ remove }}" class="form-horizontal" method="post" enctype="multipart/form-data" id="form-files">
-    <div class="table-responsive">
-      <table class="table table-striped table-bordered table-hover">
-        <thead>
+  <form action="{{ url_remove }}" class="form-horizontal" method="post" enctype="multipart/form-data" id="form-files">
+    <table class="table table-striped table-bordered table-hover">
+      <thead>
+        <tr>
+          <td class="text-center"><input type="checkbox"  id="files-select-all"></td>
+          <td>{{ column_module_name }}</td>
+          <td>{{ column_module_size }}</td>
+          <td>{{ column_module_date }}</td>
+        </tr>
+      </thead>
+      {% for module in module_list %}
+        <tbody>
           <tr>
-            <td class="text-center"><input type="checkbox"  id="files-select-all"></td>
-            <td>{{ column_module_name }}</td>
-            <td>{{ column_module_size }}</td>
-            <td>{{ column_module_date }}</td>
+            <td class="text-center"><input name="module_list[]" type="checkbox" value="{{ module['file'] }}"></td>
+            <td><a href="{{ module['link'] }}">{{ module['name'] }}</a></td>
+            <td>{{ module['size' ] }}</td>
+            <td>{{ module['date'] }}</td>
           </tr>
-        </thead>
-        {% for module in module_list %}
-          <tbody>
-            <tr>
-              <td class="text-center"><input name="module_list[]" type="checkbox" value="{{ module['file'] }}"></td>
-              <td><a href="{{ module['link'] }}">{{ module['name'] }}</a></td>
-              <td>{{ module['size' ] }}</td>
-              <td>{{ module['date'] }}</td>
-            </tr>
-          </tbody>
-        {% endfor %}
-        <tfoot>
-          <tr>
-            <td colspan="4">
-              {% if (module_total) %}
-                <div class="alert alert-success alert-dismissible" role="alert">
-                  <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                  <strong>{{ success }}</strong> {{ text_total }} {{ module_total }}
-                </div>
-              {% endif %}
-            </td>
-          </tr>
-        </tfoot>
-      </table>
-    </div>
+        </tbody>
+      {% endfor %}
+      <tfoot>
+        <tr>
+          <td colspan="4">
+            {% if (module_total) %}
+              <div class="alert alert-success alert-dismissible" role="alert">
+                <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <strong>{{ success }}</strong> {{ text_total }} {{ module_total }}
+              </div>
+            {% endif %}
+          </td>
+        </tr>
+      </tfoot>
+    </table>
   </form>
 {% else %}
   <div class="alert alert-warning alert-dismissible" role="alert">
