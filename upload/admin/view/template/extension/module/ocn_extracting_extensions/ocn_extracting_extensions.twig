@@ -104,24 +104,56 @@
 
 <script>
 $(document).ready(function(){
+  // Clear
   $('#button-clear').on('click', function () {
     $("#list").empty();
     $('#input-search').val('');
   });
 
+  // Search modules
   $('#button-search').on('click', function () {
     const module = $('#input-search').val();
     const button = $('#button-search');
+
     clearAlerts();
+
     if (module !== '') {
       searchModules(module);
     } else {
       const warning = button.attr('data-warning');
       const error = button.attr('data-error');
+      
       showAlert($('#list'), 'warning', warning, error);
     }
   });
 
+  function searchModules(module) {
+    const button = $('#button-search');
+    const url = button.attr('data-url');
+    let list = $("#list");
+
+    list.html('');
+    lock();
+    button.find('i.fa').removeClass('fa-search').addClass('fa-spinner fa-pulse');
+
+    list.load(
+      url,
+      { module: module },
+      function( response, status, xhr ) {
+        if ( status === "error" ) {
+          let msg = "Error: ";
+          $( "#files" ).html( msg + xhr.status + " " + xhr.statusText );
+        }
+        if ( status === "success" ) {
+          // if status success
+        }
+        unLock()
+        button.find('i.fa').removeClass('fa-spinner fa-pulse').addClass('fa-search');
+      }
+    );
+  }
+
+  // Search files
   $('#button-files').on('click', function () {
     getFiles();
   });
@@ -130,6 +162,34 @@ $(document).ready(function(){
     getFiles();
   });
 
+  function getFiles(data = false) {
+    const button = $('#button-files');
+    const url = button.attr('data-url');
+    let files = $("#files");
+
+    files.html('');
+    lock();
+    button.find('i.fa').removeClass('fa-refresh').addClass('fa-spinner fa-pulse');
+
+    files.load(url, function( response, status, xhr ) {
+      if ( status === "error" ) {
+        let msg = "Error: ";
+          files.html( msg + xhr.status + " " + xhr.statusText );
+      }
+      if ( status === "success" ) {
+        // if status success
+      }
+
+      if (data) {
+        showAlert(files, data.color, data.status, data.success);
+      }
+
+      unLock()
+      button.find('i.fa').removeClass('fa-spinner fa-pulse').addClass('fa-refresh');
+    });
+  }
+
+  // Add files to zip
   $('#button-extract').on('click', function () {
     const button = $('#button-extract');
     let list = $("#list");
@@ -175,33 +235,7 @@ $(document).ready(function(){
     );
   });
 
-  function getFiles(data = false) {
-    const button = $('#button-files');
-    const url = button.attr('data-url');
-    let files = $("#files");
-
-    files.html('');
-    lock();
-    button.find('i.fa').removeClass('fa-refresh').addClass('fa-spinner fa-pulse');
-
-    files.load(url, function( response, status, xhr ) {
-      if ( status === "error" ) {
-        let msg = "Error: ";
-          files.html( msg + xhr.status + " " + xhr.statusText );
-      }
-      if ( status === "success" ) {
-        // if status success
-      }
-
-      if (data) {
-        showAlert(files, data.color, data.status, data.success);
-      }
-
-      unLock()
-      button.find('i.fa').removeClass('fa-spinner fa-pulse').addClass('fa-refresh');
-    });
-  }
-
+  // Remove files
   $('#button-remove').on('click', function () {
     const button = $('#button-remove');
     const url = button.attr('data-url');
@@ -250,32 +284,7 @@ $(document).ready(function(){
     );
   });
 
-  function searchModules(module) {
-    const button = $('#button-search');
-    const url = button.attr('data-url');
-    let list = $("#list");
-
-    list.html('');
-    lock();
-    button.find('i.fa').removeClass('fa-search').addClass('fa-spinner fa-pulse');
-
-    list.load(
-      url,
-      { module: module },
-      function( response, status, xhr ) {
-        if ( status === "error" ) {
-          let msg = "Error: ";
-          $( "#files" ).html( msg + xhr.status + " " + xhr.statusText );
-        }
-        if ( status === "success" ) {
-          // if status success
-        }
-        unLock()
-        button.find('i.fa').removeClass('fa-spinner fa-pulse').addClass('fa-search');
-      }
-    );
-  }
-
+  // Lock/Unlock buttons
   function lock() {
     $('#input-search').prop('disabled', true);
     $('#button-extract').prop('disabled', true);
@@ -294,6 +303,7 @@ $(document).ready(function(){
     $('#button-remove').prop('disabled', false);
   }
 
+  // Alerts
   function showAlert(block, color, status, text) {
     block.find('> .alert').hide('slow');
     let alertBlock = '<div class="alert alert-' + color + ' alert-dismissible" role="alert"><button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button><strong>' + status + '</strong> ' + text + '</div>';
