@@ -8,11 +8,11 @@ $_['tab_files']            = 'Files';
 $_['tab_info']             = 'Information';
 
 // Column
-$_['column_path_name']     = 'Path';
-$_['column_file_name']     = 'File';
-$_['column_module_name']   = 'Module name';
-$_['column_module_size']   = 'Size, KB';
-$_['column_module_date']   = 'Date of creation';
+$_['column_search_path']   = 'Path';
+$_['column_search_file']   = 'File';
+$_['column_file_name']     = 'Module name';
+$_['column_file_size']     = 'Size, KB';
+$_['column_file_date']     = 'Date of creation';
 
 // Data
 $_['data_version']         = '3.0.0.0';
@@ -52,9 +52,11 @@ $_['empty_files']          = 'No files found. To unload the module go to the <b>
 
 // Error
 $_['error_permission']     = 'You have no rights to control the module Module Extract!';
-$_['error_module']         = 'Enter the name of the module!';
+$_['error_name_min']       = 'Module name must be more than 5 characters!';
 $_['error_extract']        = 'You must select at least one file!';
-$_['error_class_zip']      = 'Your host doesnt support ZipArchive, the file is not created!';
-$_['error_creat_zip']      = 'An error occurred creating a zip-archive!';
+$_['error_class_zip']      = 'Your host doesn\'t support ZipArchive, the file is not created!';
+$_['error_create_zip']     = 'An error occurred creating a zip-archive!';
 $_['error_select_extract'] = 'Select the files to extract!';
 $_['error_select_delete' ] = 'Select files to delete!';
+$_['error_download_file']  = 'Select file to download!';
+$_['error_download_not']   = 'Attempt to download is not a file or file does not exist!';

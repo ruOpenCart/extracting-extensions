@@ -1,22 +1,27 @@
-{% if (module_search) %}
+{% if error_warning and error_module %}
+  <div class="alert alert-danger alert-dismissible"><i class="fa fa-exclamation-circle"></i> {{ error_warning }} {{ error_module }}
+    <button type="button" class="close" data-dismiss="alert">&times;</button>
+  </div>
+{% endif %}
+{% if (modules) %}
   <form action="{{ url_extract }}" class="form-horizontal" method="post" enctype="multipart/form-data" id="form-search">
-    <input type="hidden" name="extract_module" value="{{ module }}">
+    <input type="hidden" name="extract_module" value="{{ module_name }}">
     <table class="table table-striped table-bordered table-hover">
       <thead>
         <tr>
           <td class="text-center"><input type="checkbox" id="module-select-all"></td>
-          <td>{{ column_path_name }}</td>
-          <td>{{ column_file_name }}</td>
+          <td>{{ column_search_path }}</td>
+          <td>{{ column_search_file }}</td>
         </tr>
       </thead>
       <tbody>
-        {% for modules in module_search %}
+        {% for modules in modules %}
           <tr>
             <td class="text-uppercase" colspan="3"><b>{{ modules['module'] }}({{ modules.files|length }})</b></td>
           </tr>
           {% for module in modules['files'] %}
             <tr>
-              <td class="text-center"><input type="checkbox" name="module_search[]" value="{{ module['name'] }}"></td>
+              <td class="text-center"><input type="checkbox" name="modules[]" value="{{ module['name'] }}"></td>
               <td>{{ module['path'] }}</td>
               <td>{{ module['file'] }}</td>
             </tr>
@@ -26,10 +31,10 @@
       <tfoot>
         <tr>
           <td colspan="3">
-            {% if (module_total is defined) %}
+            {% if (total is defined) %}
               <div class="alert alert-success alert-dismissible" role="alert">
                 <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                <strong>{{ success }}</strong> {{ text_total }} {{ module_total }}
+                <strong>{{ success }}</strong> {{ text_total }} {{ total }}
               </div>
             {% endif %}
           </td>
@@ -47,7 +52,7 @@
 <script>
 $(document).ready(function(){
   $('#module-select-all').on('click', function () {
-    $('input[name*="module_search"]').prop('checked', this.checked);
+    $('input[name*="modules"]').prop('checked', this.checked);
   })
 });
 </script>

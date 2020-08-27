@@ -10,17 +10,11 @@
     </div>
   </div>
   <div class="container-fluid" id="container">
-    {% if error_warning %}
-    <div class="alert alert-danger alert-dismissible"><i class="fa fa-exclamation-circle"></i> {{ error_warning }}
+    {% if error_warning and error_download %}
+    <div class="alert alert-danger alert-dismissible"><i class="fa fa-exclamation-circle"></i> {{ error_warning }} {{ error_download }}
       <button type="button" class="close" data-dismiss="alert">&times;</button>
     </div>
     {% endif %}
-    {% if success %}
-    <div class="alert alert-success alert-dismissible"><i class="fa fa-check-circle"></i> {{ success }}
-      <button type="button" class="close" data-dismiss="alert">&times;</button>
-    </div>
-    {% endif %}
-
     <div class="panel panel-default">
       <div class="panel-heading">
         <div class="pull-right">
@@ -43,7 +37,7 @@
               </div>
               <div class="col-sm-6">
                 <div class="input-group">
-                  <input type="text" class="form-control" id="input-search" name="module" value="{{ module }}" required>
+                  <input type="text" class="form-control" id="input-search" name="module_name" value="" required>
                   <span class="input-group-btn">
                     <button class="btn btn-primary" type="button" id="button-search" data-url="{{ url_search }}" data-warning="{{ warning }}" data-error="{{ error_module }}"><i class="fa fa-search"></i> {{ button_search }}</button>
                   </span>
@@ -51,7 +45,7 @@
               </div>
               <div class="col-sm-3">
                 <div class="btn-group pull-right" role="group">
-                  <button class="btn btn-warning" type="button" id="button-extract" data-url="{{ url_extract }}" data-success="{{ success }}" data-warning="{{ warning }}" data-error="{{ error_extract }}"><i class="fa fa-file-archive-o"></i> {{ button_extract }}</button>
+                  <button class="btn btn-warning" type="button" id="button-extract" data-url="{{ url_extract }}" data-warning="{{ warning }}" data-error="{{ error_extract }}"><i class="fa fa-file-archive-o"></i> {{ button_extract }}</button>
                   <button class="btn btn-secondary" type="button" id="button-clear"><i class="fa fa-times"></i> {{ button_clear }}</button>
                 </div>
               </div>
@@ -65,8 +59,8 @@
               <div class="col-sm-9"></div>
               <div class="col-sm-3">
                 <div class="btn-group pull-right" role="group">
-                  <button class="btn btn-primary" type="button" id="button-files" data-url="{{ url_files }}" data-success="{{ success }}" data-warning="{{ warning }}"><i class="fa fa-refresh"></i> {{ button_update }}</button>
-                  <button class="btn btn-danger" type="button" id="button-remove" data-url="{{ url_remove }}" data-success="{{ success }}" data-warning="{{ warning }}" data-error="{{ error_select_delete }}"><i class="fa fa-trash"></i> {{ button_remove }}</button>
+                  <button class="btn btn-primary" type="button" id="button-files" data-url="{{ url_files }}"><i class="fa fa-refresh"></i> {{ button_update }}</button>
+                  <button class="btn btn-danger" type="button" id="button-remove" data-url="{{ url_remove }}" data-warning="{{ warning }}" data-error="{{ error_select_delete }}"><i class="fa fa-trash"></i> {{ button_remove }}</button>
                 </div>
               </div>
             </div>
@@ -98,6 +92,7 @@
           </div>
         </div>
       </div>
+      <div class="panel-footer">{{ heading_title }} v{{ data_version }}</div>
     </div>
   </div>
 </div>
@@ -112,13 +107,13 @@ $(document).ready(function(){
 
   // Search modules
   $('#button-search').on('click', function () {
-    const module = $('#input-search').val();
+    const module_name = $('#input-search').val();
     const button = $('#button-search');
 
     clearAlerts();
 
-    if (module !== '') {
-      searchModules(module);
+    if (module_name !== '') {
+      searchModules(module_name);
     } else {
       const warning = button.attr('data-warning');
       const error = button.attr('data-error');
@@ -127,7 +122,7 @@ $(document).ready(function(){
     }
   });
 
-  function searchModules(module) {
+  function searchModules(module_name) {
     const button = $('#button-search');
     const url = button.attr('data-url');
     let list = $("#list");
@@ -138,11 +133,11 @@ $(document).ready(function(){
 
     list.load(
       url,
-      { module: module },
+      { module_name: module_name },
       function( response, status, xhr ) {
         if ( status === "error" ) {
           let msg = "Error: ";
-          $( "#files" ).html( msg + xhr.status + " " + xhr.statusText );
+          list.html( msg + xhr.status + " " + xhr.statusText );
         }
         if ( status === "success" ) {
           // if status success
@@ -176,10 +171,6 @@ $(document).ready(function(){
         let msg = "Error: ";
           files.html( msg + xhr.status + " " + xhr.statusText );
       }
-      if ( status === "success" ) {
-        // if status success
-      }
-
       if (data) {
         showAlert(files, data.color, data.status, data.success);
       }
@@ -194,8 +185,8 @@ $(document).ready(function(){
     const button = $('#button-extract');
     let list = $("#list");
     let checked = [];
-    $('input[name*="module_search"]:checked').each(function() {
-        checked.push(this.value);
+    $('input[name*="modules"]:checked').each(function() {
+      checked.push(this.value);
     });
     clearAlerts(list);
 
@@ -212,7 +203,16 @@ $(document).ready(function(){
         data: $('#form-search').serialize(),
         dataType: 'json',
         success: function (response) {
-          showAlert(list, 'success', success, response.success);
+          if (response.errors) {
+            if(response.errors.error_extract) {
+              showAlert(list, 'danger', response.errors.error_warning, response.errors.error_extract);
+            }
+            if(response.errors.error_zip) {
+              showAlert(list, 'danger', response.errors.error_warning, response.errors.error_extract);
+            }
+          } else if (response.success) {
+            showAlert(list, 'success', response.success, response.success_text);
+          }
         },
         error: function (xhr, ajaxOptions, thrownError) {
           alert(thrownError + "\r\n" + xhr.statusText + "\r\n" + xhr.responseText);
@@ -241,7 +241,7 @@ $(document).ready(function(){
     const url = button.attr('data-url');
     let files = $("#files");
     let checked = [];
-    $('input[name*="module_list"]:checked').each(function() {
+    $('input[name*="files"]:checked').each(function() {
         checked.push(this.value);
     });
 
@@ -255,7 +255,6 @@ $(document).ready(function(){
         data: $('#form-files').serialize(),
         dataType: 'json',
         success: function(response) {
-          console.log(response);
           let data = {
               color: 'success',
               status: response.status,
