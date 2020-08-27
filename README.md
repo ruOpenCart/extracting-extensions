@@ -9,3 +9,4 @@
 
 ## Ссылки
 - [Ресурс на форуме](https://forum.opencart.name/resources/59/)
+- [Тема поддержки расширения](https://forum.opencart.name/threads/ocn-extracting-extensions.85/)
