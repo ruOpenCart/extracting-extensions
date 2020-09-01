@@ -13,12 +13,23 @@ $_['column_search_file']   = 'Файл';
 $_['column_file_name']     = 'Название модуля';
 $_['column_file_size']     = 'Размер, Кб';
 $_['column_file_date']     = 'Дата создания';
+$_['column_search_id']         = '#';
+$_['column_search_code']       = 'Код';
+$_['column_search_name']       = 'Название';
+$_['column_search_author']     = 'Автор';
+$_['column_search_version']    = 'Версия';
+$_['column_search_status']     = 'Статус';
+$_['column_search_date_added'] = 'Добавлен';
+
+// Table
+$_['table_files']           = 'Список файлов';
+$_['table_modifications']   = 'Модификация';
 
 // Data
-$_['data_version']         = '3.0.0.0';
+$_['data_version']         = '3.0.1.0';
 $_['data_author_name']     = 'Hkr';
 $_['data_author_link']     = 'https://forum.opencart.name/members/hkr.3/';
-$_['data_extension_link']  = 'https://forum.opencart.name/resources/';
+$_['data_extension_link']  = 'https://forum.opencart.name/resources/59/';
 
 // Help
 $_['help_module_name'    ] = '(например: ocn_extracting_extensions)';

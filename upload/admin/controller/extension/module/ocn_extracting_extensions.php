@@ -2,13 +2,13 @@
 class ControllerExtensionModuleOCNExtractingExtensions extends Controller {
 	private $error = [];
 	private $disallow_dir = [];
-	
+
 	public function install() {
 		$this->load->model('setting/setting');
 		$data = ['module_ocn_extracting_extensions_status' => 1];
 		$this->model_setting_setting->editSetting('module_ocn_extracting_extensions', $data);
 	}
-	
+
 	public function uninstall() {}
 
 	public function index() {
@@ -30,7 +30,7 @@ class ControllerExtensionModuleOCNExtractingExtensions extends Controller {
 				'href' => $this->url->link('extension/module/ocn_extracting_extensions', 'user_token=' . $this->session->data['user_token'], true),
 			)
 		);
-		
+
 		//Errors
 		if (isset($this->session->data['error_warning'])) {
 			$data['error_warning'] = $this->session->data['error_warning'];
@@ -38,14 +38,14 @@ class ControllerExtensionModuleOCNExtractingExtensions extends Controller {
 		} else {
 			$data['error_warning'] = '';
 		}
-		
+
 		if (isset($this->session->data['error_download'])) {
 			$data['error_download'] = $this->session->data['error_download'];
 			unset($this->session->data['error_download']);
 		} else {
 			$data['error_download'] = '';
 		}
-		
+
 		// Urls
 		$data['url_cancel'] = $this->url->link('marketplace/extension', 'user_token=' . $this->session->data['user_token'] . '&type=module', true);
 		$data['url_search'] = $this->url->link('extension/module/ocn_extracting_extensions/search', 'user_token=' . $this->session->data['user_token'], true);
@@ -57,13 +57,14 @@ class ControllerExtensionModuleOCNExtractingExtensions extends Controller {
 		$data['header'] = $this->load->controller('common/header');
 		$data['column_left'] = $this->load->controller('common/column_left');
 		$data['footer'] = $this->load->controller('common/footer');
-		
+
 		$this->response->setOutput($this->load->view('extension/module/ocn_extracting_extensions/ocn_extracting_extensions', $data));
 	}
-	
+
 	public function search() {
 		$this->load->language('extension/module/ocn_extracting_extensions');
-		
+		$this->load->model('setting/modification');
+
 		if ($this->validateSearchModules()) {
 			$data['url_extract'] = $this->url->link('extension/module/ocn_extracting_extensions/extract', 'user_token=' . $this->session->data['user_token'], true);
 			$data['success'] = $this->language->get('success');
@@ -74,6 +75,7 @@ class ControllerExtensionModuleOCNExtractingExtensions extends Controller {
 				DIR_STORAGE
 			];
 			$data['modules'] = $this->searchModules($directory, $directory, $data['module_name']);
+			$data['ocmod'] = $this->model_setting_modification->getModificationByCode($data['module_name']);
 			$data['total' ] = count($data['modules']);
 		} else {
 			if (isset($this->error['warning'])) {
@@ -87,15 +89,15 @@ class ControllerExtensionModuleOCNExtractingExtensions extends Controller {
 				$data['error_module'] = '';
 			}
 		}
-		
+
 		$this->response->setOutput($this->load->view('extension/module/ocn_extracting_extensions/ocn_extracting_extensions_list', $data));
 	}
-	
+
 	protected function validateSearchModules() {
 		if (!$this->user->hasPermission('modify', 'extension/module/ocn_extracting_extensions')) {
 			$this->error['warning'] = $this->language->get('error_permission');
 		}
-		
+
 		if ((utf8_strlen($this->request->post['module_name']) < 5)) {
 			$this->error['module'] = $this->language->get('error_name_min');
 		}
@@ -103,10 +105,10 @@ class ControllerExtensionModuleOCNExtractingExtensions extends Controller {
 		if ($this->error && !isset($this->error['warning'])) {
 			$this->error['warning'] = $this->language->get('warning');
 		}
-		
+
 		return !$this->error;
 	}
-	
+
 	private function searchModules($dir, $dir_, $module_name) {
 		static $files = [];
 		$s = '/';
@@ -139,13 +141,17 @@ class ControllerExtensionModuleOCNExtractingExtensions extends Controller {
 
 		return $files;
 	}
-	
+
 	public function extract() {
 		$this->load->language('extension/module/ocn_extracting_extensions');
-		
+
 		if ($this->validateExtractModules()) {
 			$module_name = (string)$this->request->post['extract_module'];
-			$this->extractModules($this->request->post['modules'], $module_name);
+			$modules = $this->request->post['modules'];
+			$ocmod_id = $this->request->post['ocmod'] ?? false;
+
+			$this->extractModules($modules, $ocmod_id, $module_name);
+
 			$data['success'] = $this->language->get('success');
 			$data['success_text'] = str_replace('{name}', $module_name, $this->language->get('success_extract'));
 		} else {
@@ -159,20 +165,20 @@ class ControllerExtensionModuleOCNExtractingExtensions extends Controller {
 				$data['errors']['error_extract'] = $this->error['extract'];
 			}
 		}
-		
+
 		$this->response->addHeader('Content-Type: application/json; charset=utf-8');
 		$this->response->setOutput(json_encode($data));
 	}
-	
+
 	protected function validateExtractModules() {
 		if (!$this->user->hasPermission('modify', 'extension/module/ocn_extracting_extensions') || !$this->user->hasPermission('access', 'extension/module/ocn_extracting_extensions')) {
 			$this->error['warning'] = $this->language->get('error_permission');
 		}
-		
+
 		if (!class_exists('ZipArchive')) {
 			$this->error['zip'] = $this->language->get('error_class_zip');
 		}
-		
+
 		if (!isset($this->request->post['modules']) || !is_array($this->request->post['modules'])) {
 			$this->error['extract'] = $this->language->get('error_extract');
 		}
@@ -180,11 +186,11 @@ class ControllerExtensionModuleOCNExtractingExtensions extends Controller {
 		if ($this->error && !isset($this->error['warning'])) {
 			$this->error['warning'] = $this->language->get('warning');
 		}
-		
+
 		return !$this->error;
 	}
-	
-	private function extractModules($modules, $module_name) {
+
+	private function extractModules($modules, $ocmod_id, $module_name) {
 		$dir = $this->validateDir() . $module_name . '.' . time() . '.' . md5 ($module_name) . '.zip';
 		$zip = new ZipArchive();
 		if ($zip->open($dir, ZIPARCHIVE::CREATE) !== true) {
@@ -207,12 +213,19 @@ class ControllerExtensionModuleOCNExtractingExtensions extends Controller {
 			$dir_replace = 'upload' . str_replace($directory, '', $dir_zip);
 			$zip->addFile($modules_list, $dir_replace . $info['basename']);
 		}
+
+		if ($ocmod_id) {
+			$this->load->model('setting/modification');
+			$modification = $this->model_setting_modification->getModification($ocmod_id);
+			$zip->addFromString ('install.xml', $modification['xml']);
+		}
+
 		$zip->close();
 	}
-	
+
 	public function files() {
 		$this->load->language('extension/module/ocn_extracting_extensions');
-		
+
 		if ($this->validateGetFiles()) {
 			$data['url_remove'] = $this->url->link('extension/module/ocn_extracting_extensions/remove', 'user_token=' . $this->session->data['user_token'], true);
 			$data['success'] = $this->language->get('success');
@@ -228,7 +241,7 @@ class ControllerExtensionModuleOCNExtractingExtensions extends Controller {
 
 		$this->response->setOutput($this->load->view('extension/module/ocn_extracting_extensions/ocn_extracting_extensions_files', $data));
 	}
-	
+
 	protected function validateGetFiles() {
 		if (!$this->user->hasPermission('modify', 'extension/module/ocn_extracting_extensions') || !$this->user->hasPermission('access', 'extension/module/ocn_extracting_extensions')) {
 			$this->error['warning'] = $this->language->get('error_permission');
@@ -237,10 +250,10 @@ class ControllerExtensionModuleOCNExtractingExtensions extends Controller {
 		if ($this->error && !isset($this->error['warning'])) {
 			$this->error['warning'] = $this->language->get('warning');
 		}
-		
+
 		return !$this->error;
 	}
-	
+
 	private function getFiles() {
 		$modules = [];
 		$files = glob($this->validateDir() . '*');
@@ -263,10 +276,10 @@ class ControllerExtensionModuleOCNExtractingExtensions extends Controller {
 
 		return $modules;
 	}
-	
+
 	public function remove() {
 		$this->load->language('extension/module/ocn_extracting_extensions');
-		
+
 		if ($this->validateRemoveFiles()) {
 			foreach ($this->request->post['files'] as $module) {
 				if (file_exists ($module)) {
@@ -287,11 +300,11 @@ class ControllerExtensionModuleOCNExtractingExtensions extends Controller {
 				$data['error_delete'] = '';
 			}
 		}
-		
+
 		$this->response->addHeader('Content-Type: application/json; charset=utf-8');
 		$this->response->setOutput(json_encode($data));
 	}
-	
+
 	protected function validateRemoveFiles() {
 		if (!$this->user->hasPermission('modify', 'extension/module/ocn_extracting_extensions') || !$this->user->hasPermission('access', 'extension/module/ocn_extracting_extensions')) {
 			$this->error['warning'] = $this->language->get('error_permission');
@@ -304,7 +317,7 @@ class ControllerExtensionModuleOCNExtractingExtensions extends Controller {
 		if ($this->error && !isset($this->error['warning'])) {
 			$this->error['warning'] = $this->language->get('warning');
 		}
-		
+
 		return !$this->error;
 	}
 
@@ -353,7 +366,7 @@ class ControllerExtensionModuleOCNExtractingExtensions extends Controller {
 		if ($this->error && !isset($this->error['warning'])) {
 			$this->error['warning'] = $this->language->get('warning');
 		}
-		
+
 		return !$this->error;
 	}
 

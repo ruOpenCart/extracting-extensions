@@ -7,6 +7,7 @@
   <form action="{{ url_extract }}" class="form-horizontal" method="post" enctype="multipart/form-data" id="form-search">
     <input type="hidden" name="extract_module" value="{{ module_name }}">
     <table class="table table-striped table-bordered table-hover">
+      <caption>{{ table_files }}</caption>
       <thead>
         <tr>
           <td class="text-center"><input type="checkbox" id="module-select-all"></td>
@@ -41,6 +42,35 @@
         </tr>
       </tfoot>
     </table>
+    {% if ocmod %}
+    <table class="table table-striped table-bordered table-hover">
+      <caption>{{ table_modifications }}</caption>
+      <thead>
+      <tr>
+        <td></td>
+        <td>{{ column_search_id }}</td>
+        <td>{{ column_search_code }}</td>
+        <td>{{ column_search_name }}</td>
+        <td>{{ column_search_author }}</td>
+        <td>{{ column_search_version }}</td>
+        <td>{{ column_search_status }}</td>
+        <td>{{ column_search_date_added }}</td>
+      </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td class="text-center"><input type="checkbox" name="ocmod" value="{{ ocmod['modification_id'] }}"></td>
+          <td>{{ ocmod['modification_id'] }}</td>
+          <td>{{ ocmod['code'] }}</td>
+          <td>{{ ocmod['name'] }}</td>
+          <td>{{ ocmod['author'] }}</td>
+          <td>{{ ocmod['version'] }}</td>
+          <td>{{ ocmod['status'] }}</td>
+          <td>{{ ocmod['date_added'] }}</td>
+        </tr>
+      </tbody>
+    </table>
+    {% endif %}
   </form>
 {% else %}
   <div class="alert alert-warning alert-dismissible" role="alert">
@@ -53,6 +83,6 @@
 $(document).ready(function(){
   $('#module-select-all').on('click', function () {
     $('input[name*="modules"]').prop('checked', this.checked);
-  })
+  });
 });
 </script>
