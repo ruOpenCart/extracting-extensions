@@ -16,20 +16,20 @@ class ControllerExtensionModuleOCNExtractingExtensions extends Controller {
 		$this->document->setTitle($this->language->get('heading_title'));
 
 		// BreadCrumbs
-		$data['breadcrumbs'] = array (
-			array (
+		$data['breadcrumbs'] = [
+			[
 				'text' => $this->language->get('text_home'),
 				'href' => $this->url->link('common/dashboard', 'user_token=' . $this->session->data['user_token'], true)
-			),
-			array (
+			],
+			[
 				'text' => $this->language->get('text_extension'),
 				'href' => $this->url->link('marketplace/extension', 'user_token=' . $this->session->data['user_token'] . '&type=module', true)
-			),
-			array (
+			],
+			[
 				'text' => $this->language->get('heading_title'),
-				'href' => $this->url->link('extension/module/ocn_extracting_extensions', 'user_token=' . $this->session->data['user_token'], true),
-			)
-		);
+				'href' => $this->url->link('extension/module/ocn_extracting_extensions', 'user_token=' . $this->session->data['user_token'], true)
+			]
+		];
 
 		//Errors
 		if (isset($this->session->data['error_warning'])) {
