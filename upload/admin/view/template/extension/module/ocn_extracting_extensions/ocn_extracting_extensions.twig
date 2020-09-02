@@ -39,7 +39,7 @@
                 <div class="input-group">
                   <input type="text" class="form-control" id="input-search" name="module_name" value="" required>
                   <span class="input-group-btn">
-                    <button class="btn btn-primary" type="button" id="button-search" data-url="{{ url_search }}" data-warning="{{ warning }}" data-error="{{ error_module }}"><i class="fa fa-search"></i> {{ button_search }}</button>
+                    <button class="btn btn-primary" type="button" id="button-search" data-url="{{ url_search }}" data-warning="{{ warning }}" data-error="{{ error_name_min }}"><i class="fa fa-search"></i> {{ button_search }}</button>
                   </span>
                 </div>
               </div>
@@ -106,7 +106,15 @@ $(document).ready(function(){
   });
 
   // Search modules
-  $('#button-search').on('click', function () {
+  $('#input-search').keydown(function(e) {
+    if(e.keyCode === 13) {
+      validateSearch();
+    }
+  });
+
+  $('#button-search').on('click', validateSearch);
+
+  function validateSearch() {
     const module_name = $('#input-search').val();
     const button = $('#button-search');
 
@@ -117,10 +125,10 @@ $(document).ready(function(){
     } else {
       const warning = button.attr('data-warning');
       const error = button.attr('data-error');
-      
+
       showAlert($('#list'), 'warning', warning, error);
     }
-  });
+  }
 
   function searchModules(module_name) {
     const button = $('#button-search');
@@ -227,10 +235,10 @@ $(document).ready(function(){
       const error = button.attr('data-error');
       showAlert(list, 'warning', warning, error);
     }
-    
+
     setTimeout(function() {
-      clearAlerts(list);
-      }, 
+        clearAlerts(list);
+      },
       10000
     );
   });
